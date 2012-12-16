@@ -52,6 +52,6 @@ setup(
     long_description='__doc__',
     install_requires=['requests'],
     zip_safe=False,
-    tests_require=['tox'],
+    tests_require=['tox', 'pytest'],
     cmdclass={'test': Tox},
 )
