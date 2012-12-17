@@ -37,7 +37,7 @@ Get user information::
     from redminepy import users
 
     host = 'redmine.example.tld'
-    key = 'redmineapikey'
+    apikey = 'redmineapikey'
 
     ruser = users.User(host, apikey)
     user = ruser.get(3)
@@ -53,7 +53,7 @@ Create a new user::
     from redminepy import users
 
     host = 'redmine.example.tld'
-    key = 'redmineapikey'
+    apikey = 'redmineapikey'
 
     ruser = users.User(host, apikey)
 
@@ -72,7 +72,7 @@ Add an existing user to a group::
     from redminepy import groups
 
     host = 'redmine.example.tld'
-    key = 'redmineapikey'
+    apikey = 'redmineapikey'
 
     group = groups.Group(host, apikey)
     gid, uid = 453, 390
