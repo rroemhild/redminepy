@@ -31,6 +31,14 @@ class RedmineApiObject(object):
         return str(self.__dict__)
 
 
+class RedmineApiListObject(RedmineApiObject):
+    def __init__(self, d):
+        RedmineApiObject.__init__(self, d)
+        
+    def __str__(self):
+        return str(self.__dict__)
+
+
 class Redmine(object):
     """
     Python Redmine Project API Class
@@ -45,12 +53,10 @@ class Redmine(object):
         if not ssl:
             self._scheme = 'http'
 
-    def _get(self, page, include=None):
-        url = '%s://%s/%s.json?key=%s' % (self._scheme, self._host,
-                                          page, self._key)
-        if include:
-            url = '%s&include=%s' % (url, include)
-        r = requests.get(url, headers=self._headers)
+    def _get(self, page, payload={}):
+        url = '%s://%s/%s.json' % (self._scheme, self._host, page)
+        payload.update({'key': self._key})
+        r = requests.get(url, headers=self._headers, params=payload)
         return r.json
 
     def _post(self, page, payload):
