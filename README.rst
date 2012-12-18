@@ -14,6 +14,7 @@ API and should be considerd as experimental.
 Requirements
 ============
 
+- Redmine 1.1.0
 - python 2.6 or newer
 - requests
 
@@ -57,12 +58,12 @@ Create a new user::
 
     ruser = users.User(host, apikey)
 
-    data = {'login': 'newuser',
-            'firstname': 'New',
-            'lastname': 'User',
-            'mail': 'newuser@example.tld'
+    data = {u'login': u'newuser',
+            u'firstname': u'New',
+            u'lastname': u'User',
+            u'mail': u'newuser@example.tld'
             }
-    ruser.new(users.RedmineUserObject(data)
+    ruser.new(users.RedmineUserObject(data, True)
 
 Add user to group
 -----------------
@@ -75,6 +76,6 @@ Add an existing user to a group::
     apikey = 'redmineapikey'
 
     group = groups.Group(host, apikey)
-    gid, uid = 453, 390
+    gid, uid = 2, 111
     group.add(gid, uid)
 

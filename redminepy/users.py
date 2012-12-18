@@ -13,55 +13,50 @@ Part of redminepy: Python Redmine API
 from redminepy import redmine
 
 
+class RedmineUserError(Exception):
+    """Exception for Redmine API errors"""
+
+
 class RedmineUserObject(redmine.RedmineApiObject):
-    def __init__(self, user,  new=False):
+    def __init__(self, user, new=False):
         if new:
-            user = {'user': user}
+            user = {u'user': user}
         if not user.has_key('user'):
-            raise redmine.RedmineApiError('No user in result.')
+            raise RedmineUserError('No user in result.')
         redmine.RedmineApiObject.__init__(self, user)
 
     def __getattr__(self, key):
-        return self.get(key)
-        
-    def get(self, key):
-        user = dict(self.user)
-        return user[key]
+        return self.__dict__['user'][key]
+
+    def __setattr__(self, key, val):
+        if key == '__dict__':
+            dict.__setattr__(self, key, val)
+        elif self.__dict__.has_key('user'):
+            dict.__setitem__(self.user, key, val)
 
 
 class RedmineUserListObject(redmine.RedmineApiListObject):
-    def __init__(self, ulist):
-        if not ulist.has_key('users'):
-            raise redmine.RedmineApiError('No user list in result.')
-        redmine.RedmineApiListObject.__init__(self, ulist)
-
-    def search(self, key, val=None):
-        user_list = []
-        for user in self.__getattribute__('users'):
-            if user.has_key(key):
-                if val:
-                    if user[key] == val:
-                        user_list.append(user)
-                else:
-                    user_list.append(user)
-        return user_list
+    def __init__(self, ulist, resource='users'):
+        if not ulist.has_key(resource):
+            raise RedmineUserError('No user list in result.')
+        redmine.RedmineApiListObject.__init__(self, ulist, resource)
 
     def get_by_mail(self, mail):
         try:
             if not isinstance(mail, str):
-                mail = int(mail)
-            user = self.search('mail', mail)[0]
+                mail = str(mail)
+            user = self.find('mail', mail)[0]
             return RedmineUserObject(user, True)
         except ValueError:
             return None
         except KeyError:
             return None
 
-    def get_by_id(self, userid):
+    def get_by_id(self, uid):
         try:
-            if not isinstance(userid, int):
-                userid = int(userid)
-            user = self.search('id', userid)[0]
+            if not isinstance(uid, int):
+                userid = int(uid)
+            user = self.find('id', uid)[0]
             return RedmineUserObject(user, True)
         except ValueError:
             return None
@@ -71,62 +66,57 @@ class RedmineUserListObject(redmine.RedmineApiListObject):
     def get_by_login(self, login):
         try:
             if not isinstance(login, str):
-                login = int(login)
-            user = self.search('login', login)[0]
+                login = str(login)
+            user = self.find('login', login)[0]
             return RedmineUserObject(user, True)
         except ValueError:
             return None
         except KeyError:
             return None
         except IndexError:
-            raise redmine.RedmineApiError('User not found')
+            raise RedmineUserError('User not found')
 
 
 class User(redmine.Redmine):
     """
-    Redmine User Class
+    Redmine REST Api User Class
+
+    :params host: Hostname for the Redmine instance
+    :params apikey: Redmine API-Key
+    :params ssl: Whether use https or not
     """
 
-    def __init__(self, host, apikey):
-        redmine.Redmine.__init__(self, host, apikey)
-        self._page = 'users'
+    def __init__(self, host, apikey, ssl= True):
+        redmine.Redmine.__init__(self, host, apikey, ssl)
+        self._resource = 'users'
 
-    def get(self, uid, include=[]):
-        payload = {}
-        page = '%s/%s' % (self._page, uid)
+    def get(self, uid, include=False):
+        params = {}
+        page = '%s/%s' % (self._resource, uid)
         if isinstance(include, list):
             include = ','.join(include)
-            payload = {'include': include}
-        return RedmineUserObject(self._get(page, payload))
+            params = {'include': include}
+        return RedmineUserObject(self._get(page, params))
 
     def list(self):
-        offset = 0
-        limit = 100
-        payload = {'offset': offset, 'limit': limit}
-        result = self._get(self._page, payload)
-        total = result.get('total_count')
-        if total > payload['limit']:
-            getrange = total / payload['limit']
-            for request in range(0, getrange):
-                payload['offset'] = payload['offset'] + limit
-                payload['limit'] = payload['limit'] + limit
-                next_users = self._get(self._page, payload).get('users')
-                for user in next_users:
-                    result.get('users').append(user)
-        return RedmineUserListObject(result)
+        return RedmineUserListObject(self._list())
 
     def current(self):
-        page = 'users/current'
+        page = '%s/current' % self._resource
         return RedmineUserObject(self._get(page))
 
-    def update(self, uid, data):
-        page = '%s/%s' % (self._page, uid)
-        self._put(page, data.payload())
+    def update(self, data):
+        if not isinstance(data, RedmineUserObject):
+            raise RedmineUserError('Expecting RedmineUserObject as data.')
+        page = '%s/%s' % (self._resource, data.id)
+        self._put(page, data)
 
     def new(self, data):
-        self._post(self._page, data.payload())
+        if not isinstance(data, RedmineUserObject):
+            raise RedmineUserError('Expecting RedmineUserObject as data.')
+        self._post(self._resource, data)
 
     def delete(self, uid):
-        page = '%s/%s' % (self._page, uid)
+        page = '%s/%s' % (self._resource, uid)
         self._delete(page)
 
