@@ -39,6 +39,9 @@ class RedmineApiListObject(RedmineApiObject):
         RedmineApiObject.__init__(self, d)
         self._resource = resource
 
+    def __iter__(self):
+        return iter(self.__getattribute__(self._resource))
+
     def find(self, key, val=None):
         entry_list = []
         for entry in self.__getattribute__(self._resource):

@@ -116,7 +116,7 @@ class User(redmine.Redmine):
             raise RedmineUserError('Expecting RedmineUserObject as data.')
         self._post(self._resource, data)
 
-    def delete(self, uid):
-        page = '%s/%s' % (self._resource, uid)
+    def delete(self, rid):
+        page = '%s/%s' % (self._resource, rid)
         self._delete(page)
 
