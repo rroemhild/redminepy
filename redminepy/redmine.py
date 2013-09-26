@@ -73,25 +73,28 @@ class Redmine(object):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
         if not isinstance(params, dict):
             raise RedmineApiError('params must be a dict.')
-        r = requests.get(url, headers=self._headers, params=params)
+        r = requests.get(url, headers=self._headers, params=params,
+                         verify=False)
         return r.json()
 
     def _post(self, page, data={}):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
-        r = requests.post(url, data=data.get_json(), headers=self._headers)
+        r = requests.post(url, data=data.get_json(), headers=self._headers,
+                          verify=False)
         if not r.status_code == requests.codes.created and not \
           r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
 
     def _put(self, page, data={}):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
-        r = requests.put(url, data=data.get_json(), headers=self._headers)
+        r = requests.put(url, data=data.get_json(), headers=self._headers,
+                         verify=False)
         if not r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
 
     def _delete(self, page):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
-        r = requests.delete(url, headers=self._headers)
+        r = requests.delete(url, headers=self._headers, verify=False)
         if not r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
 
