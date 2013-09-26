@@ -86,8 +86,8 @@ class User(redmine.Redmine):
     :params ssl: Whether use https or not
     """
 
-    def __init__(self, host, apikey, ssl= True):
-        redmine.Redmine.__init__(self, host, apikey, ssl)
+    def __init__(self, host, apikey, ssl=True, verify=True):
+        redmine.Redmine.__init__(self, host, apikey, ssl, verify)
         self._resource = 'users'
 
     def get(self, uid, include=False):
@@ -98,8 +98,8 @@ class User(redmine.Redmine):
             params = {'include': include}
         return RedmineUserObject(self._get(page, params))
 
-    def list(self, include=None):
-        return RedmineUserListObject(self._list())
+    def list(self, **kwargs):
+        return RedmineUserListObject(self._list(kwargs))
 
     def current(self):
         page = '%s/current' % self._resource

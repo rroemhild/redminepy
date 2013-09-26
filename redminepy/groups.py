@@ -73,8 +73,8 @@ class Group(redmine.Redmine):
     :params ssl: Whether use https or not
     """
 
-    def __init__(self, host, apikey, ssl=True):
-        redmine.Redmine.__init__(self, host, apikey, ssl)
+    def __init__(self, host, apikey, ssl=True, verify=True):
+        redmine.Redmine.__init__(self, host, apikey, ssl, verify)
         self._resource = 'groups'
 
     def get(self, gid, include=False):
@@ -85,8 +85,8 @@ class Group(redmine.Redmine):
             params = {'include': include}
         return RedmineGroupObject(self._get(page, params))
 
-    def list(self, include=None):
-        return RedmineGroupListObject(self._list())
+    def list(self, **kwargs):
+        return RedmineGroupListObject(self._list(kwargs))
 
     def update(self, gid, data):
         if not isinstance(data, RedmineGroupObject):

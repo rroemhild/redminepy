@@ -63,9 +63,10 @@ class Redmine(object):
     :params ssl: Whether use https or not
     """
 
-    def __init__(self, host, apikey, ssl=True):
+    def __init__(self, host, apikey, ssl=True, verify=True):
         self._host = host
         self._scheme = 'https'
+        self._verify = verify
         self._headers = {'Content-Type': 'application/json',
                          'X-Redmine-API-Key': apikey}
 
@@ -77,13 +78,13 @@ class Redmine(object):
         if not isinstance(params, dict):
             raise RedmineApiError('params must be a dict.')
         r = requests.get(url, headers=self._headers, params=params,
-                         verify=False)
+                         verify=self._verify)
         return r.json()
 
     def _post(self, page, data={}):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
         r = requests.post(url, data=data.get_json(), headers=self._headers,
-                          verify=False)
+                          verify=self._verify)
         if not r.status_code == requests.codes.created and not \
           r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
@@ -91,20 +92,24 @@ class Redmine(object):
     def _put(self, page, data={}):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
         r = requests.put(url, data=data.get_json(), headers=self._headers,
-                         verify=False)
+                         verify=self._verify)
         if not r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
 
     def _delete(self, page):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)
-        r = requests.delete(url, headers=self._headers, verify=False)
+        r = requests.delete(url, headers=self._headers, verify=self._verify)
         if not r.status_code == requests.codes.ok:
             raise RedmineApiError(r.text)
 
-    def _list(self):
+    def _list(self, opt_filters):
         offset = 0
         limit = 100
+        filter_params = {}
+        for key in opt_filters:
+            filter_params[key] = opt_filters[key]
         params = {'offset': offset, 'limit': limit}
+        params.update(filter_params)
         result = self._get(self._resource, params)
         total = result.get('total_count')
         if total > params['limit']:
