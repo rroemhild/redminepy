@@ -12,27 +12,19 @@ the Redmine API.
 :license: MIT, see LICENSE for more details.
 """
 
-from setuptools import setup
-from setuptools.command.test import test as TestCommand
 import sys
+import redminepy
+
+from setuptools import setup
 
 
-class Tox(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import tox
-        errno = tox.cmdline(self.test_args)
-        sys.exit(errno)
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 
 setup(
     name='redminepy',
-    version='0.1',
+    version=redminepy.__version__,
     author='Rafael Römhild',
     author_email='rafael@roemhild.de',
     description='Python module for the Redmine API.',
@@ -48,10 +40,8 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
         ],
     url='http://github.com/rroemhild/redminepy',
-    keywords=['redmine', 'api'],
+    keywords=['redmine', 'api', 'rest'],
     long_description='__doc__',
-    install_requires=['requests'],
+    install_requires=required,
     zip_safe=False,
-    tests_require=['tox', 'pytest'],
-    cmdclass={'test': Tox},
 )

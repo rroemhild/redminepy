@@ -1,5 +1,6 @@
 global-exclude *~ *.pyc .gitignore *.orig
 
+include requirements.txt
 include README.rst
 include LICENSE
 include TODO

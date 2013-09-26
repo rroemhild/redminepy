@@ -74,7 +74,7 @@ class Redmine(object):
         if not isinstance(params, dict):
             raise RedmineApiError('params must be a dict.')
         r = requests.get(url, headers=self._headers, params=params)
-        return r.json
+        return r.json()
 
     def _post(self, page, data={}):
         url = '%s://%s/%s.json' % (self._scheme, self._host, page)

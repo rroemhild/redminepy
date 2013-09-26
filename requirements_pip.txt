@@ -1,2 +1,0 @@
-requests
--e git://github.com/rroemhild/redminepy.git#egg=redminepy

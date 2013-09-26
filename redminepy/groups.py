@@ -85,7 +85,7 @@ class Group(redmine.Redmine):
             params = {'include': include}
         return RedmineGroupObject(self._get(page, params))
 
-    def list(self):
+    def list(self, include=None):
         return RedmineGroupListObject(self._list())
 
     def update(self, gid, data):

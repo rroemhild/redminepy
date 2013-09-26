@@ -98,7 +98,7 @@ class User(redmine.Redmine):
             params = {'include': include}
         return RedmineUserObject(self._get(page, params))
 
-    def list(self):
+    def list(self, include=None):
         return RedmineUserListObject(self._list())
 
     def current(self):
